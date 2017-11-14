@@ -1,0 +1,48 @@
+#create a model with just the pclass and sex as inputs
+
+import pandas as pd
+import numpy as np
+
+from sklearn.ensemble import RandomForestClassifier     #to import the machine learning algorithm
+from sklearn.cross_validation import train_test_split       #to import test-train-split function
+from sklearn.externals import joblib    #to import program which writes our model to a file
+
+#to turn off pandas error messages
+pd.options.mode.chained_assignment=None
+
+#first step is to import data
+data=pd.read_csv('titanic_train.csv')
+print data.head()
+
+
+
+#next step is to select inputs
+data_inputs=data[['pclass', 'sex']]
+print data_inputs.head()
+
+#next step is to select expected output
+expected_output=data['survived']
+print expected_output.head()
+
+#next step is to codify the data and turn strings into numbers using the .replace function
+data_inputs['pclass'].replace('1st', 1, inplace=True)
+data_inputs['pclass'].replace('2nd', 2, inplace=True)
+data_inputs['pclass'].replace('3rd', 3, inplace=True)
+
+data_inputs['sex']=np.where(data_inputs['sex']=='female', 0, 1)
+print data_inputs.head()
+
+#now, create train and test data for input and expected output | x is input, y is output
+x_train, x_test, y_train, y_test=train_test_split(data_inputs,expected_output, test_size=0.33, random_state=42)
+
+# define RandomForestClassifier and assign n_estimators to 100
+rf=RandomForestClassifier(n_estimators=100)
+
+#now run the train data through the algorithm to train in with rf.fit()
+rf.fit(x_train, y_train)
+
+#time to test how accurate our data is by comparing it to test data wit rf.score()
+accuracy=rf.score(x_test, y_test)
+
+#multiply accuracy by 100 to get a percentage
+print accuracy*100
